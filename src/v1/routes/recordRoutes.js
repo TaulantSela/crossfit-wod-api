@@ -1,5 +1,5 @@
 const express = require("express");
-const membersController = require("../../controllers/memberController");
+const recordController = require("../../controllers/recordController");
 const authenticate = require("../../middlewares/authenticate");
 const authorize = require("../../middlewares/authorize");
 
@@ -7,23 +7,22 @@ const router = express.Router();
 
 /**
  * @openapi
- * /api/v1/members:
+ * /api/v1/records:
  *   get:
- *     summary: Retrieve all members
+ *     summary: Retrieve all records
  *     tags:
- *       - Members
+ *       - Records
  *     parameters:
  *       - in: query
- *         name: gender
+ *         name: workoutId
  *         schema:
  *           type: string
- *         description: Filter members by gender
+ *         description: Filter records by workout id
  *       - in: query
- *         name: email
+ *         name: memberId
  *         schema:
  *           type: string
- *           format: email
- *         description: Filter members by email
+ *         description: Filter records by member id
  *     responses:
  *       200:
  *         description: OK
@@ -37,7 +36,7 @@ const router = express.Router();
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: "#/components/schemas/Member"
+ *                     $ref: "#/components/schemas/Record"
  *       5XX:
  *         description: Server error
  *         content:
@@ -45,15 +44,15 @@ const router = express.Router();
  *             schema:
  *               $ref: "#/components/schemas/ErrorResponse"
  */
-router.get("/", membersController.getAllMembers);
+router.get("/", recordController.getAllRecords);
 
 /**
  * @openapi
- * /api/v1/members:
+ * /api/v1/records:
  *   post:
- *     summary: Create a new member
+ *     summary: Create a new record
  *     tags:
- *       - Members
+ *       - Records
  *     requestBody:
  *       required: true
  *       content:
@@ -61,27 +60,23 @@ router.get("/", membersController.getAllMembers);
  *           schema:
  *             type: object
  *             required:
- *               - name
- *               - gender
- *               - dateOfBirth
- *               - email
+ *               - workout
+ *               - memberId
+ *               - record
  *             properties:
- *               name:
+ *               workout:
  *                 type: string
- *               gender:
+ *               memberId:
  *                 type: string
- *               dateOfBirth:
+ *               record:
  *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
+ *               member:
  *                 type: string
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       201:
- *         description: Member created
+ *         description: Record created
  *         content:
  *           application/json:
  *             schema:
@@ -90,7 +85,7 @@ router.get("/", membersController.getAllMembers);
  *                 status:
  *                   type: string
  *                 data:
- *                   $ref: "#/components/schemas/Member"
+ *                   $ref: "#/components/schemas/Record"
  *       400:
  *         description: Invalid payload
  *         content:
@@ -108,23 +103,22 @@ router.post(
   "/",
   authenticate,
   authorize(["coach", "admin"]),
-  membersController.createNewMember
+  recordController.createNewRecord
 );
 
 /**
  * @openapi
- * /api/v1/members/{memberId}:
+ * /api/v1/records/{recordId}:
  *   get:
- *     summary: Retrieve a single member
+ *     summary: Retrieve a single record
  *     tags:
- *       - Members
+ *       - Records
  *     parameters:
  *       - in: path
- *         name: memberId
+ *         name: recordId
  *         required: true
  *         schema:
  *           type: string
- *         description: The UUID of the member
  *     responses:
  *       200:
  *         description: OK
@@ -136,15 +130,15 @@ router.post(
  *                 status:
  *                   type: string
  *                 data:
- *                   $ref: "#/components/schemas/Member"
+ *                   $ref: "#/components/schemas/Record"
  *       400:
- *         description: Missing memberId parameter
+ *         description: Missing recordId parameter
  *         content:
  *           application/json:
  *             schema:
  *               $ref: "#/components/schemas/ErrorResponse"
  *       404:
- *         description: Member not found
+ *         description: Record not found
  *         content:
  *           application/json:
  *             schema:
@@ -156,18 +150,18 @@ router.post(
  *             schema:
  *               $ref: "#/components/schemas/ErrorResponse"
  */
-router.get("/:memberId", membersController.getOneMember);
+router.get("/:recordId", recordController.getOneRecord);
 
 /**
  * @openapi
- * /api/v1/members/{memberId}:
+ * /api/v1/records/{recordId}:
  *   patch:
- *     summary: Update an existing member
+ *     summary: Update an existing record
  *     tags:
- *       - Members
+ *       - Records
  *     parameters:
  *       - in: path
- *         name: memberId
+ *         name: recordId
  *         required: true
  *         schema:
  *           type: string
@@ -178,22 +172,19 @@ router.get("/:memberId", membersController.getOneMember);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               workout:
  *                 type: string
- *               gender:
+ *               memberId:
  *                 type: string
- *               dateOfBirth:
+ *               record:
  *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
+ *               member:
  *                 type: string
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Member updated
+ *         description: Record updated
  *         content:
  *           application/json:
  *             schema:
@@ -202,7 +193,7 @@ router.get("/:memberId", membersController.getOneMember);
  *                 status:
  *                   type: string
  *                 data:
- *                   $ref: "#/components/schemas/Member"
+ *                   $ref: "#/components/schemas/Record"
  *       400:
  *         description: Invalid payload or parameters
  *         content:
@@ -210,7 +201,7 @@ router.get("/:memberId", membersController.getOneMember);
  *             schema:
  *               $ref: "#/components/schemas/ErrorResponse"
  *       404:
- *         description: Member not found
+ *         description: Record not found
  *         content:
  *           application/json:
  *             schema:
@@ -223,22 +214,22 @@ router.get("/:memberId", membersController.getOneMember);
  *               $ref: "#/components/schemas/ErrorResponse"
  */
 router.patch(
-  "/:memberId",
+  "/:recordId",
   authenticate,
   authorize(["coach", "admin"]),
-  membersController.updateOneMember
+  recordController.updateOneRecord
 );
 
 /**
  * @openapi
- * /api/v1/members/{memberId}:
+ * /api/v1/records/{recordId}:
  *   delete:
- *     summary: Delete a member
+ *     summary: Delete a record
  *     tags:
- *       - Members
+ *       - Records
  *     parameters:
  *       - in: path
- *         name: memberId
+ *         name: recordId
  *         required: true
  *         schema:
  *           type: string
@@ -246,15 +237,15 @@ router.patch(
  *       - bearerAuth: []
  *     responses:
  *       204:
- *         description: Member deleted
+ *         description: Record deleted
  *       400:
- *         description: Missing memberId parameter
+ *         description: Missing recordId parameter
  *         content:
  *           application/json:
  *             schema:
  *               $ref: "#/components/schemas/ErrorResponse"
  *       404:
- *         description: Member not found
+ *         description: Record not found
  *         content:
  *           application/json:
  *             schema:
@@ -267,10 +258,10 @@ router.patch(
  *               $ref: "#/components/schemas/ErrorResponse"
  */
 router.delete(
-  "/:memberId",
+  "/:recordId",
   authenticate,
   authorize(["coach", "admin"]),
-  membersController.deleteOneMember
+  recordController.deleteOneRecord
 );
 
 module.exports = router;
